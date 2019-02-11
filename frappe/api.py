@@ -191,7 +191,8 @@ def validate_jwt():
     from newmatik.next.helpers import get_jwt_config
 
     jwt_token = frappe.get_request_header("Authorization", None)
-    if jwt_token:
+    
+    if jwt_token and not any(x in jwt_token for x in ['token', 'Basic', 'bearer']):
         jwt_config = get_jwt_config()
         payload = jwt.decode(
             jwt_token, jwt_config['JWT_SECRET'], jwt_config['JWT_ALGORITHM']
