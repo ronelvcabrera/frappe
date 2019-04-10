@@ -11,6 +11,8 @@ from frappe import _
 from six.moves.urllib.parse import urlparse, urlencode
 import base64
 
+class ExpiredLoginException(Exception):
+    http_status_code = 401
 
 def handle():
     """
@@ -200,7 +202,7 @@ def validate_jwt():
                 jwt_token, jwt_config['JWT_SECRET'], jwt_config['JWT_ALGORITHM']
             )
         except jwt.ExpiredSignatureError as e:
-            raise e
+    		raise ExpiredLoginException()
 
         frappe.local.user_id = payload['user_id']
         validate_api_key_secret(payload['key'], payload['secret'])
