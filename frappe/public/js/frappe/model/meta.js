@@ -16,6 +16,7 @@ $.extend(frappe.meta, {
 		$.each(doc.fields, function(i, df) {
 			frappe.meta.add_field(df);
 		})
+		console.log(doc)
 		frappe.meta.sync_messages(doc);
 		if(doc.__print_formats) frappe.model.sync(doc.__print_formats);
 		if(doc.__workflow_docs) frappe.model.sync(doc.__workflow_docs);
@@ -213,6 +214,7 @@ $.extend(frappe.meta, {
 	},
 
 	sync_messages: function(doc) {
+		console.log('sync_messages')
 		if(doc.__messages) {
 			$.extend(frappe._messages, doc.__messages);
 		}
