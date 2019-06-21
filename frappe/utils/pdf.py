@@ -15,14 +15,20 @@ def get_pdf(html, options=None, output = None):
 	fname = os.path.join("/tmp", "frappe-pdf-{0}.pdf".format(frappe.generate_hash()))
 
 	try:
+		print("here 0")
+		print(options)
+		print(html)
 		pdfkit.from_string(html, fname, options=options or {})
+		print("here 1")
 		if output:
 			append_pdf(PdfFileReader(fname),output)
+			print("here 2")
 		else:
 			with open(fname, "rb") as fileobj:
 				filedata = fileobj.read()
 
 	except IOError as e:
+		print(e.message)
 		if ("ContentNotFoundError" in e.message
 			or "ContentOperationNotPermittedError" in e.message
 			or "UnknownContentError" in e.message
