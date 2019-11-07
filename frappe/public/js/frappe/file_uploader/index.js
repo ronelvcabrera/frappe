@@ -19,7 +19,7 @@ export default class FileUploader {
 		} else {
 			this.wrapper = wrapper.get ? wrapper.get(0) : wrapper;
 		}
-
+		
 		this.$fileuploader = new Vue({
 			el: this.wrapper,
 			render: h => h(FileUploaderComponent, {
