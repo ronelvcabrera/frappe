@@ -376,7 +376,7 @@ frappe.ui.form.Timeline = class Timeline {
 		c["delete"] = "";
 		c["edit"] = "";
 		if(c.communication_type=="Comment" && (c.comment_type || "Comment") === "Comment") {
-			if(frappe.model.can_delete("Comment")) {
+			if(frappe.user.name == c.sender && frappe.model.can_delete("Comment")) {
 				c["delete"] = `<a class="close delete-comment" title="${__('Delete')}"  href="#"><i class="octicon octicon-x"></i></a>`;
 			}
 
