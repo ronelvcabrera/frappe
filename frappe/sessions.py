@@ -258,7 +258,7 @@ class Session:
 			# set language
 			self.data.update({'data': data, 'user':data.user, 'sid': self.sid})
 			self.user = data.user
-			validate_ip_address(self.user)
+			# validate_ip_address(self.user)
 			self.device = data.device
 		else:
 			self.start_as_guest()
