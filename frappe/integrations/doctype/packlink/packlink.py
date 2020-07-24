@@ -8,6 +8,7 @@ import frappe
 import requests
 from frappe import _
 from frappe.model.document import Document
+from frappe.integrations.utils import get_tracking_url
 
 PACKLINK_PROVIDER = 'Packlink'
 
@@ -16,7 +17,7 @@ class Packlink(Document):
 
 def get_packlink_available_services(pickup_address, delivery_address, shipment_parcel,pickup_date):
 	""" 
-
+		Retrieve rates at PackLink from specification stated
 	"""
 	from_zip = pickup_address.pincode
 	from_country_code = pickup_address.country_code
@@ -39,7 +40,6 @@ def get_packlink_available_services(pickup_address, delivery_address, shipment_p
 		to_zip,
 		shipment_parcel_params
 	)
-	print('url', url)
 	api_key = frappe.db.get_single_value('Packlink', 'api_key')
 	enabled = frappe.db.get_single_value('Packlink', 'enabled')
 	if not api_key or not enabled:
@@ -63,15 +63,9 @@ def get_packlink_available_services(pickup_address, delivery_address, shipment_p
 				available_service = frappe._dict()
 				available_service.service_provider = PACKLINK_PROVIDER
 				available_service.carrier = response['carrier_name']
-				available_service.service_name = 'UPS'
-				available_service.is_preferred = 1
-				# available_service.service_name = \
-				#	 match_parcel_service_type_alias(response['name'],
-				#									 response['carrier_name'])
-				# available_service.is_preferred = \
-				#	 frappe.db.get_value('Parcel Service Type',
-				#						 available_service.service_name,
-				#						 'show_in_preferred_services_list')
+				available_service.carrier_name = response['name']
+				available_service.service_name = ''
+				available_service.is_preferred = 0
 				available_service.total_price = response['price']['base_price']
 				available_service.actual_price = response['price']['total_price']
 				available_service.service_id = response['id']
@@ -92,7 +86,7 @@ def create_packlink_shipment(pickup_address, delivery_address, shipment_parcel,
 	description_of_content, pickup_date, value_of_goods, pickup_contact,
 	delivery_contact, service_info):
 	"""  
-
+		Create a transaction at PackLink
 	"""
 	enabled = frappe.db.get_single_value('Packlink', 'enabled')
 	if not enabled:
@@ -171,6 +165,9 @@ def create_packlink_shipment(pickup_address, delivery_address, shipment_parcel,
 
 
 def get_packlink_label(shipment_id):
+	"""
+		Retrieve shipment label from PackLink
+	"""
 	enabled = frappe.db.get_single_value('Packlink', 'enabled')
 	if not enabled:
 		frappe.throw(_('Packlink integration is not enabled'))
@@ -191,7 +188,9 @@ def get_packlink_label(shipment_id):
 
 
 def get_packlink_tracking_data(shipment_id):
-	""" Get Packlink Tracking Info"""
+	"""
+		Get Packlink Tracking Info
+	"""
 	enabled = frappe.db.get_single_value('Packlink', 'enabled')
 	if not enabled:
 		frappe.throw(_('Packlink integration is not enabled'))
@@ -243,17 +242,4 @@ def packlink_get_parcel_list(shipment_parcel):
 
 
 def parse_pickup_date(pickup_date):
-    return pickup_date.replace('-', '/')
-
-
-def get_tracking_url(carrier, tracking_number):
-    """
-		Return the formatted Tracking URL
-	"""
-    tracking_url = ''
-    url_reference = frappe.get_value('Parcel Service', carrier, 'url_reference')
-    if url_reference:
-        tracking_url = frappe.render_template(url_reference, {'tracking_number': tracking_number})
-        tracking_url_template =  '<a href="{{ tracking_url }}" target="_blank"><b>{{ _("Click here to Track Shipment") }}</a></b>'
-        tracking_url = frappe.render_template(tracking_url_template, {'tracking_url': tracking_url})
-    return tracking_url
+	return pickup_date.replace('-', '/')
