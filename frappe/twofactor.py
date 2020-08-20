@@ -295,6 +295,8 @@ def send_token_via_email(user, token, otp_secret, otp_issuer, subject=None, mess
 		return False
 	hotp = pyotp.HOTP(otp_secret)
 	otp = hotp.at(int(token))
+	print('otp_secret', otp_secret)
+	print('otp', otp)
 	template_args = {'otp': otp, 'otp_issuer': otp_issuer}
 	if not subject:
 		subject = get_email_subject_for_2fa(template_args)
